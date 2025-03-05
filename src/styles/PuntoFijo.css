@@ -1,0 +1,289 @@
+.punto-fijo-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .method-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+    font-size: 2.5rem;
+  }
+  
+  .method-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .tab-button {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #7f8c8d;
+  }
+  
+  .tab-button:hover {
+    color: #2c3e50;
+  }
+  
+  .tab-button.active {
+    color: #e83e8c;
+    border-bottom: 3px solid #e83e8c;
+    font-weight: bold;
+  }
+  
+  .tab-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .tab-content {
+    margin-top: 2rem;
+  }
+  
+  .input-card, .results-card, .graph-card, .theory-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .equation-info {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #e83e8c;
+    border-color: #e83e8c;
+  }
+  
+  .submit-button:hover, .submit-button:focus {
+    background-color: #d83177;
+    border-color: #d83177;
+  }
+  
+  .results-title, .graph-title, .theory-title {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .result-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .result-item {
+    flex: 1;
+    min-width: 200px;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 0.5rem;
+    text-align: center;
+  }
+  
+  .result-item h4 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .text-success {
+    color: #28a745 !important;
+  }
+  
+  .text-danger {
+    color: #dc3545 !important;
+  }
+  
+  .result-message {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  
+  .result-message h4 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .iterations-title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .table-responsive {
+    margin-bottom: 1rem;
+  }
+  
+  .graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 1rem;
+  }
+  
+  .color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .color-box.red {
+    background-color: #ff0000;
+  }
+  
+  .color-box.blue {
+    background-color: #0000ff;
+  }
+  
+  .color-box.green {
+    background-color: #008000;
+  }
+  
+  .theory-section {
+    margin-bottom: 2rem;
+  }
+  
+  .theory-section h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+  }
+  
+  .theory-section p {
+    color: #6c757d;
+    line-height: 1.6;
+  }
+  
+  .theory-section ul, .theory-section ol {
+    color: #6c757d;
+    line-height: 1.6;
+    padding-left: 1.5rem;
+  }
+  
+  .theory-section li {
+    margin-bottom: 0.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .method-tabs {
+      flex-wrap: wrap;
+    }
+    
+    .tab-button {
+      margin-bottom: 0.5rem;
+    }
+    
+    .result-item {
+      min-width: 100%;
+    }
+    
+    .geogebra-container {
+      height: 400px;
+    }
+  }
+  
+  /* Estilos para el teclado matemático adaptado a la imagen */
+  .math-keyboard {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .keyboard-tab {
+    background-color: white;
+    border: none;
+    border-radius: 0;
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+  
+  .active-tab {
+    background-color: #e83e8c;
+    color: white;
+  }
+  
+  .keyboard-key {
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 12px 8px;
+    font-size: 16px;
+  }
+  
+  .keyboard-action {
+    background-color: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+  }
+  
+  /* Estilo específico para el teclado matemático similar a la imagen */
+  .math-keyboard .keyboard-row:first-child {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .math-keyboard .keyboard-row:first-child .keyboard-tab:first-child {
+    background-color: #e83e8c;
+    color: white;
+  }
+  
+  .math-keyboard .keyboard-row:last-child {
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  
+  .math-keyboard .keyboard-row:last-child .keyboard-action:last-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .math-keyboard .keyboard-row:last-child .keyboard-action:last-child::after {
+    content: "▼";
+    font-size: 12px;
+  }
