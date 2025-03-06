@@ -16,6 +16,13 @@ const HomePage = () => {
       name: 'Bisección',
       description: 'Método que divide intervalos para encontrar raíces',
       icon: '✂️',
+      available: true
+    },
+    {
+      id: 'newton-raphson',
+      name: 'Newton-Raphson',
+      description: 'Método basado en la derivada de la función',
+      icon: '🔄',
       available: true  // Cambiado a true para habilitar el método
     },
     {
@@ -23,13 +30,6 @@ const HomePage = () => {
       name: 'Secante',
       description: 'Aproximación lineal entre dos puntos',
       icon: '📉',
-      available: false
-    },
-    {
-      id: 'newton-raphson',
-      name: 'Newton-Raphson',
-      description: 'Método basado en la derivada de la función',
-      icon: '🔄',
       available: false
     }
   ];

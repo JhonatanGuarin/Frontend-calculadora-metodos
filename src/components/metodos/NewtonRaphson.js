@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert, Spinner, Table } from 'react-bootstrap';
-import { metodosBiseccion } from '../../services/api';
+import { metodosNewtonRaphson } from '../../services/api';
 import MathKeyboard from '../MathKeyboard';
 import FunctionGraph from '../FunctionGraph';
 import '../../styles/Metodos.css';
 import 'katex/dist/katex.min.css';
 
-const Biseccion = () => {
+const NewtonRaphson = () => {
   const [formData, setFormData] = useState({
     equation: '',
-    a: 0,
-    b: 1,
-    tol: 1e-6,
-    max_iter: 100
+    x0: 0,
+    tolerance: 1e-6,
+    max_iterations: 100
   });
   
   const [result, setResult] = useState(null);
@@ -34,30 +33,17 @@ const Biseccion = () => {
   ];
 
   const handleEquationChange = (expr) => {
-    // Asegurarse de que 'e' se interprete como la constante de Euler
-    let processedExpr = expr;
-    
-    // Si la expresión contiene 'e' como variable aislada, reemplazarla por math.e o exp(1)
-    // dependiendo del contexto
-    if (/\be\b/.test(processedExpr)) {
-      console.log("Detectada constante de Euler en la expresión");
-      // No necesitamos hacer nada aquí, ya que la función convertLatexToEvaluable
-      // en MathKeyboard.js se encargará de la conversión
-    }
-    
-    setFormData({ ...formData, equation: processedExpr });
+    setFormData({ ...formData, equation: expr });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let parsedValue = value;
-    
-    // Convertir a número para campos numéricos
-    if (['a', 'b', 'tol', 'max_iter'].includes(name)) {
-      parsedValue = name === 'max_iter' ? parseInt(value, 10) : parseFloat(value);
-    }
-    
-    setFormData({ ...formData, [name]: parsedValue });
+    setFormData({ 
+      ...formData, 
+      [name]: name === 'tolerance' ? parseFloat(value) : 
+              name === 'x0' ? parseFloat(value) : 
+              name === 'max_iterations' ? parseInt(value) : value 
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -68,7 +54,7 @@ const Biseccion = () => {
     
     try {
       console.log("Enviando datos:", formData);
-      const response = await metodosBiseccion.solve(formData);
+      const response = await metodosNewtonRaphson.solve(formData);
       console.log("Respuesta recibida:", response);
       
       // Verificar si la respuesta contiene un error
@@ -121,7 +107,7 @@ const Biseccion = () => {
 
   return (
     <div className="method-container">
-      <h2 className="method-title">Método de Bisección</h2>
+      <h2 className="method-title">Método de Newton-Raphson</h2>
       
       <div className="method-tabs">
         <button 
@@ -172,37 +158,23 @@ const Biseccion = () => {
                   <MathKeyboard onChange={handleEquationChange} />
                 </Form.Group>
                 
-                <div className="form-row">
-                  <Form.Group className="mb-3 half-width">
-                    <Form.Label>Límite inferior (a)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      step="any"
-                      name="a"
-                      value={formData.a}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </Form.Group>
-                  
-                  <Form.Group className="mb-3 half-width">
-                    <Form.Label>Límite superior (b)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      step="any"
-                      name="b"
-                      value={formData.b}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </Form.Group>
-                </div>
+                <Form.Group className="mb-3">
+                  <Form.Label>Valor inicial (x₀)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    step="any"
+                    name="x0"
+                    value={formData.x0}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
                 
                 <Form.Group className="mb-3">
                   <Form.Label>Tolerancia</Form.Label>
                   <Form.Select
-                    name="tol"
-                    value={formData.tol}
+                    name="tolerance"
+                    value={formData.tolerance}
                     onChange={handleInputChange}
                     required
                   >
@@ -218,8 +190,8 @@ const Biseccion = () => {
                   <Form.Label>Máximo de iteraciones</Form.Label>
                   <Form.Control
                     type="number"
-                    name="max_iter"
-                    value={formData.max_iter}
+                    name="max_iterations"
+                    value={formData.max_iterations}
                     onChange={handleInputChange}
                     required
                     min="1"
@@ -256,8 +228,8 @@ const Biseccion = () => {
                 <div className="result-item">
                   <h4>Raíz encontrada:</h4>
                   <p className="result-value">
-                    {result.raiz !== undefined && result.raiz !== null 
-                      ? safeToFixed(result.raiz) 
+                    {result.root !== undefined && result.root !== null 
+                      ? safeToFixed(result.root) 
                       : 'No encontrada'}
                   </p>
                 </div>
@@ -265,14 +237,30 @@ const Biseccion = () => {
                 <div className="result-item">
                   <h4>Iteraciones:</h4>
                   <p className="result-value">
-                    {result.iteraciones || 0}
+                    {result.iterations}
+                  </p>
+                </div>
+                
+                <div className="result-item">
+                  <h4>Convergencia:</h4>
+                  <p className={`result-value ${result.convergence ? 'text-success' : 'text-danger'}`}>
+                    {result.convergence ? 'Sí' : 'No'}
+                  </p>
+                </div>
+                
+                <div className="result-item">
+                  <h4>Error:</h4>
+                  <p className="result-value">
+                    {result.error !== undefined && result.error !== null 
+                      ? safeToExponential(result.error) 
+                      : 'N/A'}
                   </p>
                 </div>
               </div>
               
               <div className="result-message">
                 <h4>Mensaje:</h4>
-                <p>{result.mensaje || 'No hay mensaje disponible'}</p>
+                <p>{result.message || 'No hay mensaje disponible'}</p>
               </div>
               
               <h4 className="iterations-title">Tabla de Iteraciones</h4>
@@ -281,20 +269,22 @@ const Biseccion = () => {
                   <thead>
                     <tr>
                       <th>Iteración</th>
-                      <th>a</th>
-                      <th>b</th>
-                      <th>Punto Medio</th>
-                      <th>Error (%)</th>
+                      <th>x<sub>i</sub></th>
+                      <th>f(x<sub>i</sub>)</th>
+                      <th>f'(x<sub>i</sub>)</th>
+                      <th>x<sub>i+1</sub></th>
+                      <th>Error</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {result.pasos && result.pasos.map((paso, index) => (
+                    {result.all_iterations && result.all_iterations.map((iter, index) => (
                       <tr key={index}>
-                        <td>{paso.iteracion}</td>
-                        <td>{safeToFixed(paso.punto_a, 6)}</td>
-                        <td>{safeToFixed(paso.punto_b, 6)}</td>
-                        <td>{safeToFixed(paso.punto_medio, 6)}</td>
-                        <td>{safeToExponential(paso.error_porcentual)}</td>
+                        <td>{iter.iteration}</td>
+                        <td>{safeToFixed(iter.x)}</td>
+                        <td>{safeToFixed(iter["f(x)"])}</td>
+                        <td>{safeToFixed(iter["f'(x)"])}</td>
+                        <td>{safeToFixed(iter.next_x)}</td>
+                        <td>{safeToExponential(iter.error)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -322,35 +312,37 @@ const Biseccion = () => {
         {activeTab === 'theory' && (
           <Card className="theory-card">
             <Card.Body>
-              <h3 className="theory-title">Teoría del Método de Bisección</h3>
+              <h3 className="theory-title">Teoría del Método de Newton-Raphson</h3>
               
               <div className="theory-section">
                 <h4>Definición</h4>
                 <p>
-                  El método de bisección es una técnica numérica para encontrar raíces de una función continua f(x) 
-                  en un intervalo [a, b] donde f(a) y f(b) tienen signos opuestos. Se basa en el teorema del valor 
-                  intermedio, que garantiza la existencia de al menos una raíz en dicho intervalo.
+                  El método de Newton-Raphson es una técnica iterativa para encontrar raíces de ecuaciones no lineales.
+                  Utiliza la derivada de la función para aproximar la función por su recta tangente en cada iteración.
                 </p>
               </div>
               
               <div className="theory-section">
                 <h4>Algoritmo</h4>
                 <ol>
-                  <li>Seleccionar un intervalo inicial [a, b] donde f(a) × f(b) &lt; 0</li>
-                  <li>Calcular el punto medio c = (a + b) / 2</li>
-                  <li>Evaluar f(c)</li>
-                  <li>Si f(c) = 0 o |b - a| &lt; tolerancia, c es la raíz aproximada</li>
-                  <li>Si f(c) × f(a) &lt; 0, la raíz está en [a, c], entonces b = c</li>
-                  <li>Si f(c) × f(b) &lt; 0, la raíz está en [c, b], entonces a = c</li>
-                  <li>Repetir desde el paso 2 hasta alcanzar la tolerancia o el máximo de iteraciones</li>
+                  <li>Elegir un valor inicial x₀ cercano a la raíz</li>
+                  <li>Calcular la siguiente aproximación usando la fórmula: x<sub>n+1</sub> = x<sub>n</sub> - f(x<sub>n</sub>)/f'(x<sub>n</sub>)</li>
+                  <li>Repetir hasta que |x<sub>n+1</sub> - x<sub>n</sub>| &lt; tolerancia o se alcance el máximo de iteraciones</li>
                 </ol>
               </div>
               
               <div className="theory-section">
                 <h4>Convergencia</h4>
                 <p>
-                  El método de bisección siempre converge para funciones continuas cuando f(a) y f(b) tienen signos opuestos. 
-                  En cada iteración, el intervalo se reduce a la mitad, por lo que el error se reduce en un factor de 2.
+                  El método de Newton-Raphson converge cuadráticamente cuando:
+                </p>
+                <ul>
+                  <li>La función f(x) es continuamente diferenciable</li>
+                  <li>f'(x) ≠ 0 en la vecindad de la raíz</li>
+                  <li>El valor inicial x₀ está suficientemente cerca de la raíz</li>
+                </ul>
+                <p>
+                  La convergencia cuadrática significa que el número de dígitos correctos aproximadamente se duplica en cada iteración.
                 </p>
               </div>
               
@@ -358,30 +350,29 @@ const Biseccion = () => {
                 <h4>Ventajas y Desventajas</h4>
                 <p><strong>Ventajas:</strong></p>
                 <ul>
-                  <li>Simple de implementar y entender</li>
-                  <li>Garantiza convergencia para funciones continuas</li>
-                  <li>Robusto y confiable</li>
+                  <li>Convergencia rápida (cuadrática) cuando las condiciones son favorables</li>
+                  <li>Requiere pocas iteraciones para alcanzar una buena aproximación</li>
                 </ul>
                 <p><strong>Desventajas:</strong></p>
                 <ul>
-                  <li>Convergencia relativamente lenta</li>
-                  <li>Requiere que la función cambie de signo en el intervalo</li>
-                  <li>No aprovecha información sobre la pendiente de la función</li>
+                  <li>Requiere el cálculo de la derivada de la función</li>
+                  <li>Puede diverger si el valor inicial no es adecuado</li>
+                  <li>Problemas cuando f'(x) se acerca a cero (pendiente casi horizontal)</li>
                 </ul>
               </div>
               
               <div className="theory-section">
                 <h4>Ejemplo</h4>
                 <p>
-                  Para encontrar una raíz de f(x) = x² - 4 en el intervalo [1, 3]:
+                  Para resolver x² - 4 = 0 usando Newton-Raphson:
                 </p>
                 <ul>
-                  <li>f(1) = 1² - 4 = -3 (negativo)</li>
-                  <li>f(3) = 3² - 4 = 5 (positivo)</li>
-                  <li>Como f(1) y f(3) tienen signos opuestos, hay una raíz en [1, 3]</li>
-                  <li>Punto medio: c = (1 + 3) / 2 = 2</li>
-                  <li>f(2) = 2² - 4 = 0</li>
-                  <li>Como f(2) = 0, la raíz exacta es x = 2</li>
+                  <li>f(x) = x² - 4</li>
+                  <li>f'(x) = 2x</li>
+                  <li>Fórmula de iteración: x<sub>n+1</sub> = x<sub>n</sub> - (x<sub>n</sub>² - 4)/(2x<sub>n</sub>)</li>
+                  <li>Partiendo de x₀ = 3, obtenemos x₁ = 3 - (9-4)/(2*3) = 3 - 5/6 = 2.17</li>
+                  <li>Continuando, x₂ = 2.17 - (4.7-4)/(2*2.17) = 2.17 - 0.7/4.34 = 2.01</li>
+                  <li>Rápidamente converge a x = 2, que es la raíz exacta</li>
                 </ul>
               </div>
             </Card.Body>
@@ -392,4 +383,4 @@ const Biseccion = () => {
   );
 };
 
-export default Biseccion;
+export default NewtonRaphson;

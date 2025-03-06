@@ -32,6 +32,18 @@ export const metodosBiseccion = {
   }
 };
 
+export const metodosNewtonRaphson = {
+  solve: async (data) => {
+    try {
+      const response = await api.post('/metodos/newton-raphson', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error en la solicitud de Newton-Raphson:', error);
+      throw error;
+    }
+  }
+};
+
 export const health = {
   check: async () => {
     try {

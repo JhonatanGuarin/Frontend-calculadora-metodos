@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import HomePage from './components/HomePage';
 import PuntoFijo from './components/metodos/PuntoFijo';
 import Biseccion from './components/metodos/Biseccion';
+import NewtonRaphson from './components/metodos/NewtonRaphson';
 import './styles.css';
 
 function App() {
@@ -17,9 +18,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/metodos/punto-fijo" element={<PuntoFijo />} />
             <Route path="/metodos/biseccion" element={<Biseccion />} />
+            <Route path="/metodos/newton-raphson" element={<NewtonRaphson />} />
             {/* Rutas para futuros métodos */}
             <Route path="/metodos/secante" element={<div>Método de la Secante (Próximamente)</div>} />
-            <Route path="/metodos/newton-raphson" element={<div>Método de Newton-Raphson (Próximamente)</div>} />
           </Routes>
         </main>
         <Footer />

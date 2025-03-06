@@ -43,27 +43,58 @@ const PuntoFijo = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: name === 'tolerance' ? parseFloat(value) : value });
+    let parsedValue = value;
+    
+    // Convertir a número para campos numéricos
+    if (['initial_x', 'tolerance', 'max_iterations'].includes(name)) {
+      parsedValue = name === 'max_iterations' ? parseInt(value, 10) : parseFloat(value);
+    }
+    
+    setFormData({ ...formData, [name]: parsedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setResult(null); // Limpiar resultados previos
     
     try {
       console.log("Enviando datos:", formData);
       const response = await metodosPuntoFijo.solve(formData);
       console.log("Respuesta recibida:", response);
-      setResult(response);
-      setActiveTab('results');
+      
+      // Verificar si la respuesta contiene un error
+      if (response.detail) {
+        // Si hay un mensaje de error en la respuesta
+        setError(response.detail);
+        setActiveTab('input'); // Mantener al usuario en la pestaña de entrada
+      } else {
+        // Si la respuesta es exitosa
+        setResult(response);
+        setActiveTab('results'); // Cambiar a la pestaña de resultados
+      }
     } catch (err) {
       console.error("Error completo:", err);
-      setError(
-        err.response?.data?.detail || 
-        err.message || 
-        'Error al procesar la solicitud'
-      );
+      
+      // Manejar diferentes tipos de errores
+      if (err.response && err.response.data) {
+        // Error del servidor con datos estructurados
+        if (err.response.data.detail) {
+          setError(err.response.data.detail);
+        } else {
+          setError(JSON.stringify(err.response.data));
+        }
+      } else if (err.message) {
+        // Error con mensaje (como errores de red)
+        setError(err.message);
+      } else {
+        // Fallback para otros tipos de errores
+        setError('Error al procesar la solicitud. Por favor, inténtelo de nuevo.');
+      }
+      
+      // Mantener al usuario en la pestaña de entrada
+      setActiveTab('input');
     } finally {
       setLoading(false);
     }
@@ -117,6 +148,14 @@ const PuntoFijo = () => {
         {activeTab === 'input' && (
           <Card className="input-card">
             <Card.Body>
+              {/* Mostrar mensaje de error si existe */}
+              {error && (
+                <Alert variant="danger" className="mb-4">
+                  <Alert.Heading>Error</Alert.Heading>
+                  <p>{error}</p>
+                </Alert>
+              )}
+              
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-4">
                   <Form.Label>Ecuación f(x) = 0</Form.Label>
@@ -183,7 +222,7 @@ const PuntoFijo = () => {
                 >
                   {loading ? (
                     <>
-                      <Spinner animation="border" size="sm" /> 
+                      <Spinner animation="border" size="sm" className="me-2" /> 
                       Calculando...
                     </>
                   ) : (
@@ -191,12 +230,6 @@ const PuntoFijo = () => {
                   )}
                 </Button>
               </Form>
-              
-              {error && (
-                <Alert variant="danger" className="mt-3">
-                  {error}
-                </Alert>
-              )}
             </Card.Body>
           </Card>
         )}
