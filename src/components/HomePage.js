@@ -16,7 +16,7 @@ const HomePage = () => {
       name: 'Bisección',
       description: 'Método que divide intervalos para encontrar raíces',
       icon: '✂️',
-      available: false
+      available: true  // Cambiado a true para habilitar el método
     },
     {
       id: 'secante',

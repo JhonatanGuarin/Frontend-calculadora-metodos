@@ -20,6 +20,18 @@ export const metodosPuntoFijo = {
   }
 };
 
+export const metodosBiseccion = {
+  solve: async (data) => {
+    try {
+      const response = await api.post('/metodos/biseccion', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error en la solicitud de bisección:', error);
+      throw error;
+    }
+  }
+};
+
 export const health = {
   check: async () => {
     try {

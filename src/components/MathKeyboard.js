@@ -66,6 +66,18 @@ const MathKeyboard = ({ onChange, initialValue = '' }) => {
     expr = expr.replace(/x\^2/g, 'x**2');
     expr = expr.replace(/x\^3/g, 'x**3');
     
+    // Manejar la constante de Euler (e)
+    // Primero, reemplazar e^x por exp(x)
+    expr = expr.replace(/e\^{([^}]*)}/g, 'exp($1)');
+    expr = expr.replace(/e\^(\w)/g, 'exp($1)');
+    
+    // Caso especial: e^x
+    expr = expr.replace(/e\^x/g, 'exp(x)');
+    
+    // Asegurarse de que e aislada se interprete como la constante de Euler
+    // Pero solo si es la letra 'e' sola, no como parte de otra palabra
+    expr = expr.replace(/\b(e)\b/g, 'math.e');
+    
     // Limpiar espacios
     expr = expr.replace(/\s+/g, '');
     
@@ -80,6 +92,12 @@ const MathKeyboard = ({ onChange, initialValue = '' }) => {
       const pattern = new RegExp(`${func}\\*\\(`, 'g');
       expr = expr.replace(pattern, `${func}(`);
     });
+    
+    // Asegurarse de que las operaciones con exp() estén correctas
+    expr = expr.replace(/exp\*\(/g, 'exp(');
+    
+    // Asegurarse de que las multiplicaciones con variables sean explícitas
+    expr = expr.replace(/(\d)([a-zA-Z])/g, '$1*$2');
     
     console.log('LaTeX original:', latex);
     console.log('Expresión convertida:', expr);

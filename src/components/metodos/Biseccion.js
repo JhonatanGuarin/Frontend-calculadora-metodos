@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert, Spinner, Table } from 'react-bootstrap';
-import { metodosPuntoFijo } from '../../services/api';
+import { metodosBiseccion } from '../../services/api';
 import MathKeyboard from '../MathKeyboard';
 import FunctionGraph from '../FunctionGraph';
 import '../../styles/Metodos.css';
 import 'katex/dist/katex.min.css';
 
-const PuntoFijo = () => {
+const Biseccion = () => {
   const [formData, setFormData] = useState({
     equation: '',
-    g_function: '',
-    initial_x: 0,
-    tolerance: 1e-6,
-    max_iterations: 100
+    a: 0,
+    b: 1,
+    tol: 1e-6,
+    max_iter: 100
   });
   
   const [result, setResult] = useState(null);
@@ -34,16 +34,30 @@ const PuntoFijo = () => {
   ];
 
   const handleEquationChange = (expr) => {
-    setFormData({ ...formData, equation: expr });
-  };
-
-  const handleGFunctionChange = (expr) => {
-    setFormData({ ...formData, g_function: expr });
+    // Asegurarse de que 'e' se interprete como la constante de Euler
+    let processedExpr = expr;
+    
+    // Si la expresión contiene 'e' como variable aislada, reemplazarla por math.e o exp(1)
+    // dependiendo del contexto
+    if (/\be\b/.test(processedExpr)) {
+      console.log("Detectada constante de Euler en la expresión");
+      // No necesitamos hacer nada aquí, ya que la función convertLatexToEvaluable
+      // en MathKeyboard.js se encargará de la conversión
+    }
+    
+    setFormData({ ...formData, equation: processedExpr });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: name === 'tolerance' ? parseFloat(value) : value });
+    let parsedValue = value;
+    
+    // Convertir a número para campos numéricos
+    if (['a', 'b', 'tol', 'max_iter'].includes(name)) {
+      parsedValue = name === 'max_iter' ? parseInt(value, 10) : parseFloat(value);
+    }
+    
+    setFormData({ ...formData, [name]: parsedValue });
   };
 
   const handleSubmit = async (e) => {
@@ -53,7 +67,7 @@ const PuntoFijo = () => {
     
     try {
       console.log("Enviando datos:", formData);
-      const response = await metodosPuntoFijo.solve(formData);
+      const response = await metodosBiseccion.solve(formData);
       console.log("Respuesta recibida:", response);
       setResult(response);
       setActiveTab('results');
@@ -83,7 +97,7 @@ const PuntoFijo = () => {
 
   return (
     <div className="method-container">
-      <h2 className="method-title">Método de Punto Fijo</h2>
+      <h2 className="method-title">Método de Bisección</h2>
       
       <div className="method-tabs">
         <button 
@@ -126,31 +140,37 @@ const PuntoFijo = () => {
                   <MathKeyboard onChange={handleEquationChange} />
                 </Form.Group>
                 
-                <Form.Group className="mb-4">
-                  <Form.Label>Función de iteración g(x)</Form.Label>
-                  <div className="equation-info">
-                    <p>Ingrese la función g(x) tal que x = g(x). Por ejemplo, para x² - 4 = 0, podría usar g(x) = sqrt(4).</p>
-                  </div>
-                  <MathKeyboard onChange={handleGFunctionChange} />
-                </Form.Group>
-                
-                <Form.Group className="mb-3">
-                  <Form.Label>Valor inicial (x₀)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    step="any"
-                    name="initial_x"
-                    value={formData.initial_x}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </Form.Group>
+                <div className="form-row">
+                  <Form.Group className="mb-3 half-width">
+                    <Form.Label>Límite inferior (a)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="any"
+                      name="a"
+                      value={formData.a}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </Form.Group>
+                  
+                  <Form.Group className="mb-3 half-width">
+                    <Form.Label>Límite superior (b)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="any"
+                      name="b"
+                      value={formData.b}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </Form.Group>
+                </div>
                 
                 <Form.Group className="mb-3">
                   <Form.Label>Tolerancia</Form.Label>
                   <Form.Select
-                    name="tolerance"
-                    value={formData.tolerance}
+                    name="tol"
+                    value={formData.tol}
                     onChange={handleInputChange}
                     required
                   >
@@ -166,8 +186,8 @@ const PuntoFijo = () => {
                   <Form.Label>Máximo de iteraciones</Form.Label>
                   <Form.Control
                     type="number"
-                    name="max_iterations"
-                    value={formData.max_iterations}
+                    name="max_iter"
+                    value={formData.max_iter}
                     onChange={handleInputChange}
                     required
                     min="1"
@@ -210,8 +230,8 @@ const PuntoFijo = () => {
                 <div className="result-item">
                   <h4>Raíz encontrada:</h4>
                   <p className="result-value">
-                    {result.root !== undefined && result.root !== null 
-                      ? safeToFixed(result.root) 
+                    {result.raiz !== undefined && result.raiz !== null 
+                      ? safeToFixed(result.raiz) 
                       : 'No encontrada'}
                   </p>
                 </div>
@@ -219,21 +239,14 @@ const PuntoFijo = () => {
                 <div className="result-item">
                   <h4>Iteraciones:</h4>
                   <p className="result-value">
-                    {result.iterations ? result.iterations.length : 0}
-                  </p>
-                </div>
-                
-                <div className="result-item">
-                  <h4>Convergencia:</h4>
-                  <p className={`result-value ${result.converged ? 'text-success' : 'text-danger'}`}>
-                    {result.converged ? 'Sí' : 'No'}
+                    {result.iteraciones || 0}
                   </p>
                 </div>
               </div>
               
               <div className="result-message">
                 <h4>Mensaje:</h4>
-                <p>{result.message || 'No hay mensaje disponible'}</p>
+                <p>{result.mensaje || 'No hay mensaje disponible'}</p>
               </div>
               
               <h4 className="iterations-title">Tabla de Iteraciones</h4>
@@ -242,16 +255,20 @@ const PuntoFijo = () => {
                   <thead>
                     <tr>
                       <th>Iteración</th>
-                      <th>x<sub>i</sub></th>
-                      <th>Error</th>
+                      <th>a</th>
+                      <th>b</th>
+                      <th>Punto Medio</th>
+                      <th>Error (%)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {result.iterations && result.iterations.map((iter, index) => (
+                    {result.pasos && result.pasos.map((paso, index) => (
                       <tr key={index}>
-                        <td>{iter.iteration}</td>
-                        <td>{safeToFixed(iter.x_value)}</td>
-                        <td>{safeToExponential(iter.error)}</td>
+                        <td>{paso.iteracion}</td>
+                        <td>{safeToFixed(paso.punto_a, 6)}</td>
+                        <td>{safeToFixed(paso.punto_b, 6)}</td>
+                        <td>{safeToFixed(paso.punto_medio, 6)}</td>
+                        <td>{safeToExponential(paso.error_porcentual)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -279,43 +296,66 @@ const PuntoFijo = () => {
         {activeTab === 'theory' && (
           <Card className="theory-card">
             <Card.Body>
-              <h3 className="theory-title">Teoría del Método de Punto Fijo</h3>
+              <h3 className="theory-title">Teoría del Método de Bisección</h3>
               
               <div className="theory-section">
                 <h4>Definición</h4>
                 <p>
-                  El método de punto fijo es una técnica iterativa para encontrar soluciones a la ecuación f(x) = 0, 
-                  reescribiéndola como x = g(x) y generando una secuencia de aproximaciones.
+                  El método de bisección es una técnica numérica para encontrar raíces de una función continua f(x) 
+                  en un intervalo [a, b] donde f(a) y f(b) tienen signos opuestos. Se basa en el teorema del valor 
+                  intermedio, que garantiza la existencia de al menos una raíz en dicho intervalo.
                 </p>
               </div>
               
               <div className="theory-section">
                 <h4>Algoritmo</h4>
                 <ol>
-                  <li>Reescribir la ecuación f(x) = 0 como x = g(x)</li>
-                  <li>Elegir un valor inicial x₀</li>
-                  <li>Calcular x₁ = g(x₀), x₂ = g(x₁), ..., xₙ₊₁ = g(xₙ)</li>
-                  <li>Continuar hasta que |xₙ₊₁ - xₙ| &lt; tolerancia o se alcance el máximo de iteraciones</li>
+                  <li>Seleccionar un intervalo inicial [a, b] donde f(a) × f(b) &lt; 0</li>
+                  <li>Calcular el punto medio c = (a + b) / 2</li>
+                  <li>Evaluar f(c)</li>
+                  <li>Si f(c) = 0 o |b - a| &lt; tolerancia, c es la raíz aproximada</li>
+                  <li>Si f(c) × f(a) &lt; 0, la raíz está en [a, c], entonces b = c</li>
+                  <li>Si f(c) × f(b) &lt; 0, la raíz está en [c, b], entonces a = c</li>
+                  <li>Repetir desde el paso 2 hasta alcanzar la tolerancia o el máximo de iteraciones</li>
                 </ol>
               </div>
               
               <div className="theory-section">
                 <h4>Convergencia</h4>
                 <p>
-                  El método converge si |g'(x)| &lt; 1 en un intervalo alrededor de la raíz. Cuanto menor sea |g'(x)|, 
-                  más rápida será la convergencia.
+                  El método de bisección siempre converge para funciones continuas cuando f(a) y f(b) tienen signos opuestos. 
+                  En cada iteración, el intervalo se reduce a la mitad, por lo que el error se reduce en un factor de 2.
                 </p>
+              </div>
+              
+              <div className="theory-section">
+                <h4>Ventajas y Desventajas</h4>
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                  <li>Simple de implementar y entender</li>
+                  <li>Garantiza convergencia para funciones continuas</li>
+                  <li>Robusto y confiable</li>
+                </ul>
+                <p><strong>Desventajas:</strong></p>
+                <ul>
+                  <li>Convergencia relativamente lenta</li>
+                  <li>Requiere que la función cambie de signo en el intervalo</li>
+                  <li>No aprovecha información sobre la pendiente de la función</li>
+                </ul>
               </div>
               
               <div className="theory-section">
                 <h4>Ejemplo</h4>
                 <p>
-                  Para resolver x² - 4 = 0:
+                  Para encontrar una raíz de f(x) = x² - 4 en el intervalo [1, 3]:
                 </p>
                 <ul>
-                  <li>Reescribimos como x = g(x) = √4 = 2</li>
-                  <li>Partiendo de x₀ = 1, obtenemos x₁ = g(1) = 2</li>
-                  <li>Como x₁ = x₂ = 2, hemos encontrado un punto fijo</li>
+                  <li>f(1) = 1² - 4 = -3 (negativo)</li>
+                  <li>f(3) = 3² - 4 = 5 (positivo)</li>
+                  <li>Como f(1) y f(3) tienen signos opuestos, hay una raíz en [1, 3]</li>
+                  <li>Punto medio: c = (1 + 3) / 2 = 2</li>
+                  <li>f(2) = 2² - 4 = 0</li>
+                  <li>Como f(2) = 0, la raíz exacta es x = 2</li>
                 </ul>
               </div>
             </Card.Body>
@@ -326,4 +366,4 @@ const PuntoFijo = () => {
   );
 };
 
-export default PuntoFijo;
+export default Biseccion;
