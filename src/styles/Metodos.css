@@ -373,3 +373,162 @@
       height: 400px;
     }
   }
+
+  .matrix-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .matrix-row {
+    display: flex;
+    gap: var(--spacing-xs);
+    justify-content: center;
+  }
+  
+  .matrix-cell {
+    width: 70px;
+    text-align: center;
+    padding: var(--spacing-xs);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .vector-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    justify-content: center;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .vector-cell {
+    width: 70px;
+    text-align: center;
+    padding: var(--spacing-xs);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  /* Estilos para la solución del sistema */
+  .solution-title {
+    margin: var(--spacing-xl) 0 var(--spacing-md);
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  .solution-vector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin: var(--spacing-md) 0 var(--spacing-xl);
+  }
+  
+  .solution-item {
+    background-color: var(--bg-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .solution-variable {
+    font-weight: bold;
+    margin-right: var(--spacing-xs);
+    color: var(--accent-color);
+  }
+  
+  .solution-value {
+    font-family: monospace;
+    font-size: 1.1rem;
+  }
+  
+  /* Estilos para ejemplos predefinidos */
+  .examples-section {
+    background-color: var(--bg-light);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-lg);
+    border-left: 3px solid var(--primary-color);
+  }
+  
+  .example-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* Estilos para fórmulas matemáticas */
+  .formula {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.1em;
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background-color: var(--bg-light);
+    border-left: 3px solid var(--primary-color);
+    color: var(--text-primary);
+    overflow-x: auto;
+  }
+  
+  /* Estilos para detalles de convergencia */
+  .convergence-details {
+    background-color: var(--bg-light);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-top: var(--spacing-lg);
+  }
+  
+  .convergence-details h4 {
+    color: var(--secondary-color);
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+  }
+  
+  .convergence-details ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .convergence-details li {
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .convergence-details li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Adaptaciones responsivas para matrices */
+  @media (max-width: 768px) {
+    .matrix-row {
+      flex-wrap: wrap;
+    }
+    
+    .matrix-cell, .vector-cell {
+      width: 60px;
+      font-size: 0.9rem;
+    }
+    
+    .solution-vector {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .solution-item {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .example-buttons {
+      flex-direction: column;
+    }
+    
+    .example-buttons button {
+      width: 100%;
+    }
+  }

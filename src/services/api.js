@@ -44,6 +44,30 @@ export const metodosNewtonRaphson = {
   }
 };
 
+export const metodosSecante = {
+  solve: async (data) => {
+    try {
+      const response = await api.post('/metodos/secante', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error en la solicitud de Secante:', error);
+      throw error;
+    }
+  }
+};
+
+export const metodosJacobi = {
+  solve: async (data) => {
+    try {
+      const response = await api.post('/metodos/jacobi', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error en la solicitud de Jacobi:', error);
+      throw error;
+    }
+  }
+};
+
 export const health = {
   check: async () => {
     try {

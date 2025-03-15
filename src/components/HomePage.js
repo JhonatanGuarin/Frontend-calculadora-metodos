@@ -23,14 +23,21 @@ const HomePage = () => {
       name: 'Newton-Raphson',
       description: 'Método basado en la derivada de la función',
       icon: '🔄',
-      available: true  // Cambiado a true para habilitar el método
+      available: true
     },
     {
       id: 'secante',
       name: 'Secante',
       description: 'Aproximación lineal entre dos puntos',
       icon: '📉',
-      available: false
+      available: true
+    },
+    {
+      id: 'jacobi',
+      name: 'Jacobi',
+      description: 'Método iterativo para resolver sistemas de ecuaciones lineales',
+      icon: '🔢',
+      available: true
     }
   ];
 
