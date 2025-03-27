@@ -46,19 +46,6 @@ const GaussSeidel = () => {
     const newB = Array(newSize).fill(0);
     const newInitialGuess = Array(newSize).fill(0);
     
-    // Preservar los valores existentes
-    for (let i = 0; i < Math.min(newSize, formData.A.length); i++) {
-      for (let j = 0; j < Math.min(newSize, formData.A[i].length); j++) {
-        newA[i][j] = formData.A[i][j];
-      }
-      if (i < formData.b.length) {
-        newB[i] = formData.b[i];
-      }
-      if (i < formData.x0.length) {
-        newInitialGuess[i] = formData.x0[i];
-      }
-    }
-    
     setFormData({
       ...formData,
       A: newA,
@@ -70,24 +57,21 @@ const GaussSeidel = () => {
   // Manejar cambios en la matriz A
   const handleMatrixAChange = (rowIndex, colIndex, value) => {
     const newA = [...formData.A];
-    // Permitir cadenas vacías para facilitar la edición
-    newA[rowIndex][colIndex] = value === '' ? '' : parseFloat(value) || 0;
+    newA[rowIndex][colIndex] = parseFloat(value) || 0;
     setFormData({ ...formData, A: newA });
   };
 
   // Manejar cambios en el vector b
   const handleVectorBChange = (index, value) => {
     const newB = [...formData.b];
-    // Permitir cadenas vacías para facilitar la edición
-    newB[index] = value === '' ? '' : parseFloat(value) || 0;
+    newB[index] = parseFloat(value) || 0;
     setFormData({ ...formData, b: newB });
   };
 
   // Manejar cambios en el vector de aproximación inicial
   const handleInitialGuessChange = (index, value) => {
     const newInitialGuess = [...formData.x0];
-    // Permitir cadenas vacías para facilitar la edición
-    newInitialGuess[index] = value === '' ? '' : parseFloat(value) || 0;
+    newInitialGuess[index] = parseFloat(value) || 0;
     setFormData({ ...formData, x0: newInitialGuess });
   };
 
@@ -108,34 +92,8 @@ const GaussSeidel = () => {
     setError(null);
     
     try {
-      // Crear una copia profunda de los datos para procesarlos
-      const dataToSend = JSON.parse(JSON.stringify(formData));
-      
-      // Asegurarse de que no hay valores vacíos en la matriz A
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          if (dataToSend.A[i][j] === '' || dataToSend.A[i][j] === null) {
-            dataToSend.A[i][j] = 0;
-          }
-        }
-      }
-      
-      // Asegurarse de que no hay valores vacíos en el vector b
-      for (let i = 0; i < matrixSize; i++) {
-        if (dataToSend.b[i] === '' || dataToSend.b[i] === null) {
-          dataToSend.b[i] = 0;
-        }
-      }
-      
-      // Asegurarse de que no hay valores vacíos en el vector x0
-      for (let i = 0; i < matrixSize; i++) {
-        if (dataToSend.x0[i] === '' || dataToSend.x0[i] === null) {
-          dataToSend.x0[i] = 0;
-        }
-      }
-      
-      console.log("Enviando datos:", dataToSend);
-      const response = await metodosGaussSeidel.solve(dataToSend);
+      console.log("Enviando datos:", formData);
+      const response = await metodosGaussSeidel.solve(formData);
       console.log("Respuesta recibida:", response);
       setResult(response);
       setActiveTab('results');
@@ -193,23 +151,6 @@ const GaussSeidel = () => {
         ],
         b: [3, 6, 3],
         x0: [0, 0, 0],
-        tolerance: 1e-6,
-        max_iterations: 100
-      });
-    } else if (exampleNumber === 4) {
-      // Ejemplo 4: Sistema 6x6
-      setMatrixSize(6);
-      setFormData({
-        A: [
-          [10, -1, 0, 0, 0, 0],
-          [-1, 10, -1, 0, 0, 0],
-          [0, -1, 10, -1, 0, 0],
-          [0, 0, -1, 10, -1, 0],
-          [0, 0, 0, -1, 10, -1],
-          [0, 0, 0, 0, -1, 10]
-        ],
-        b: [9, 8, 8, 8, 8, 9],
-        x0: [0, 0, 0, 0, 0, 0],
         tolerance: 1e-6,
         max_iterations: 100
       });
@@ -279,15 +220,8 @@ const GaussSeidel = () => {
                     <Button 
                       variant="outline-primary" 
                       onClick={() => loadExample(3)}
-                      className="me-2"
                     >
                       Ejemplo 3 (Rápida convergencia)
-                    </Button>
-                    <Button 
-                      variant="outline-primary" 
-                      onClick={() => loadExample(4)}
-                    >
-                      Ejemplo 4 (6x6)
                     </Button>
                   </div>
                 </div>
@@ -302,7 +236,6 @@ const GaussSeidel = () => {
                     <option value="3">3x3</option>
                     <option value="4">4x4</option>
                     <option value="5">5x5</option>
-                    <option value="6">6x6</option>
                   </Form.Select>
                 </Form.Group>
                 
@@ -314,8 +247,9 @@ const GaussSeidel = () => {
                         {Array(matrixSize).fill().map((_, colIndex) => (
                           <Form.Control
                             key={`cell-${rowIndex}-${colIndex}`}
-                            type="text"
-                            value={formData.A[rowIndex][colIndex].toString()}
+                            type="number"
+                            step="any"
+                            value={formData.A[rowIndex][colIndex]}
                             onChange={(e) => handleMatrixAChange(rowIndex, colIndex, e.target.value)}
                             className="matrix-cell"
                           />
@@ -331,8 +265,9 @@ const GaussSeidel = () => {
                     {Array(matrixSize).fill().map((_, index) => (
                       <Form.Control
                         key={`b-${index}`}
-                        type="text"
-                        value={formData.b[index].toString()}
+                        type="number"
+                        step="any"
+                        value={formData.b[index]}
                         onChange={(e) => handleVectorBChange(index, e.target.value)}
                         className="vector-cell"
                       />
@@ -346,8 +281,9 @@ const GaussSeidel = () => {
                     {Array(matrixSize).fill().map((_, index) => (
                       <Form.Control
                         key={`initial-${index}`}
-                        type="text"
-                        value={formData.x0[index].toString()}
+                        type="number"
+                        step="any"
+                        value={formData.x0[index]}
                         onChange={(e) => handleInitialGuessChange(index, e.target.value)}
                         className="vector-cell"
                       />
