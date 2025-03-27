@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = "https://api-gateway-9t7o.onrender.com/api";
 
 // Crear una instancia de axios con la URL base
 const api = axios.create({
