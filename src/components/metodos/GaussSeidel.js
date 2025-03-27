@@ -435,6 +435,36 @@ const GaussSeidel = () => {
                   </ul>
                 </div>
               )}
+              
+              {result.iteration_history && result.iteration_history.length > 0 && (
+                <div className="iteration-history mt-4">
+                  <h4>Historial de Iteraciones</h4>
+                  <div className="table-responsive">
+                    <Table striped bordered hover size="sm">
+                      <thead>
+                        <tr>
+                          <th>Iteración</th>
+                          {result.solution.map((_, index) => (
+                            <th key={`header-x${index+1}`}>x<sub>{index+1}</sub></th>
+                          ))}
+                          <th>Error</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.iteration_history.map((iter, index) => (
+                          <tr key={`iter-${index}`}>
+                            <td>{iter.iteration}</td>
+                            {iter.solution.map((val, idx) => (
+                              <td key={`iter-${index}-x${idx+1}`}>{safeToFixed(val, 6)}</td>
+                            ))}
+                            <td>{safeToExponential(iter.error)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+              )}
             </Card.Body>
           </Card>
         )}
