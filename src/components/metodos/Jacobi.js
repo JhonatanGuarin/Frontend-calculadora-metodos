@@ -363,6 +363,37 @@ const Jacobi = () => {
                 ))}
               </div>
               
+              {/* Tabla de iteraciones */}
+              {result.iteration_history && result.iteration_history.length > 0 && (
+                <>
+                  <h4 className="iterations-title">Tabla de Iteraciones</h4>
+                  <div className="table-responsive">
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th>Iteración</th>
+                          {result.solution && Array.from({ length: result.solution.length }).map((_, i) => (
+                            <th key={`header-x${i+1}`}>x<sub>{i+1}</sub></th>
+                          ))}
+                          <th>Error</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.iteration_history.map((iter, index) => (
+                          <tr key={index}>
+                            <td>{index}</td>
+                            {iter.values.map((val, i) => (
+                              <td key={`iter-${index}-val-${i}`}>{safeToFixed(val, 6)}</td>
+                            ))}
+                            <td>{safeToExponential(iter.error)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </>
+              )}
+              
               {result.warnings && result.warnings.length > 0 && (
                 <Alert variant="warning" className="mt-4">
                   <h4>Advertencias:</h4>
